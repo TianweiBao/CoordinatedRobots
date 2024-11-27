@@ -1,6 +1,7 @@
 from microbit import *
 from joystick_utils import *
 from cutebot_utils import *
+from microbot_utils import *
 from utils import *
 import radio
 import machine
@@ -55,7 +56,14 @@ elif role == "cutebot":
             cutebot.set_motors_speed(left_wheel_speed, right_wheel_speed)
 
 elif role == "microbot":
-    pass
+    radio.config(group=j2c_channel)
+    microbot = Microbot()
+    while True:
+        msg = radio.receive()
+        if msg:
+            x,y = msg.split(",")
+            x,y = int(x), int(y)
+            print("Received x:{} y:{}".format(x,y))
 else:
     print("Invalid device")
     display.scroll("Invalid device")

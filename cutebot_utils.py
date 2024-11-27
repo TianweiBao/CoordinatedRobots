@@ -8,6 +8,8 @@ LEFT_LIGHT_ADDR = 0x04
 RIGHT_LIGHT_ADDR = 0x08
 LEFT_WHEEL_ADDR = 0x01
 RIGHT_WHEEL_ADDR = 0x02
+FORWARD_FLAG = 0x02
+BACKWARD_FLAG = 0x01
 
 class Cutebot():
 
@@ -30,9 +32,11 @@ class Cutebot():
         # Make sure the speed is within the range of -100~100
         left_wheel_speed = constrain(left_wheel_speed, -100, 100)
         right_wheel_speed = constrain(right_wheel_speed, -100, 100)
-        left_dir = RIGHT_WHEEL_ADDR if left_wheel_speed > 0 else LEFT_WHEEL_ADDR
-        right_dir = RIGHT_WHEEL_ADDR if right_wheel_speed > 0 else LEFT_WHEEL_ADDR
+        # Set the direction of the left and right wheels
+        left_dir = FORWARD_FLAG if left_wheel_speed > 0 else BACKWARD_FLAG
+        right_dir = FORWARD_FLAG if right_wheel_speed > 0 else BACKWARD_FLAG
         left_wheel_speed, right_wheel_speed = abs(left_wheel_speed), abs(right_wheel_speed)
+        # Send the speed and direction to the cutebot
         i2c.write(CUTEBOT_ADDR, bytearray([LEFT_WHEEL_ADDR, left_dir, left_wheel_speed, 0]))
         i2c.write(CUTEBOT_ADDR, bytearray([RIGHT_WHEEL_ADDR, right_dir, right_wheel_speed, 0]))
 
@@ -67,14 +71,16 @@ class Cutebot():
             return distance
         elif unit == "inch":
             return round(distance/30.48, 2)
-
+        else:
+            raise ValueError('Invalid Unit')
+        
     def get_tracking(self):
         """
         return the current tracking status
-        :return:00 all in white
-                10 left in black right in white
-                01 left in white right in black
-                11 all in black
+        :return:00 -> all in white
+                10 -> left in black right in white
+                01 -> left in white right in black
+                11 -> all in black
         """
         left = self.__pinL.read_digital()
         right = self.__pinR.read_digital()

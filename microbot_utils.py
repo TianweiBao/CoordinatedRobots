@@ -1,13 +1,13 @@
 from microbit import i2c, display, Image
 
 
-class MotoBit():
+class Microbot():
     '''Initialize moto:bit hardware.
     '''
-    I2C_ADDR = 0x59         # 89
-    CMD_ENABLE = 0x70       # 112
-    CMD_SPEED_LEFT = 0x21   # 33
-    CMD_SPEED_RIGHT = 0x20  # 32
+    I2C_ADDR = 0x59         # 89 in decimal
+    CMD_ENABLE = 0x70       # 112 in decimal
+    CMD_SPEED_LEFT = 0x21   # 33 in decimal
+    CMD_SPEED_RIGHT = 0x20  # 32 in decimal
 
     def __init__(self):
         # cool code that you'll write
@@ -37,4 +37,3 @@ class MotoBit():
         i2c.write(self.I2C_ADDR, bytes([self.CMD_SPEED_RIGHT, speeds[1]]))
 
 
-display.show(Image.HAPPY, clear=True, delay=2000)
