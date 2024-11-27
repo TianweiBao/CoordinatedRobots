@@ -36,11 +36,9 @@ if role == "joystick":
         x = joystick.get_rocker_value(RockerType.X)
         y = joystick.get_rocker_value(RockerType.Y)
         x_vel,y_vel = map_value(x), map_value(y)
-        #debug purposes
         print("Raw x:{} Mapped x:{} Raw y:{} Mapped y:{}".format(x,x_vel,y,y_vel))
         msg = "{},{}".format(x_vel, y_vel)
         radio.send(msg)
-        ##############
 
 elif role == "cutebot":
     radio.config(group=j2c_channel)
