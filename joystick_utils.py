@@ -1,120 +1,117 @@
 from microbit import *
 import utime 
   
-# 定义引脚枚举  
-class JoystickBitPin:  
-    P12 = 12  
-    P13 = 13  
-    P14 = 14  
-    P15 = 15  
-  
-# 定义摇杆方向类型枚举  
+class Joystick:
+      p_buzzer = 0
+      p_x = 1
+      p_y = 2       
+      p_btnC = 12  
+      p_btnD = 13  
+      p_btnE = 14  
+      p_btnF = 15  
+      p_vibration_motor = 16
+
 class RockerType:  
-    X = 1  
-    Y = 2  
-  
-# 假设ButtonType的High和Low对应于引脚上的高电平和低电平  
+      X = 1  
+      Y = 2  
+
+#Assume High and Low of ButtonType correspond to high and low levels on the pin
 ButtonType = {  
-    'down': 0,  # 低电平表示按下  
-    'up': 1     # 高电平表示释放  
+      'down': 0,  # low level indicates pressed  
+      'up': 1     # high level indicates released  
 }  
 
-class JOYSTICKBIT(object):
-      """基本描述
+class JOYSTICKBIT():
+      def __init__(self):
+            pass
 
-      joystick游戏手柄按键功能
-
-      """ 
       def init_joystick_bit(self):  
-            """初始化摇杆位 
-            P0设置为低电平(假设这是用于其他目的,如初始化LED或其他功能)
-            四个按键初始化为上拉输入模式
-            震动马达控制引脚输出高电平，默认关闭状态
+            """initialization joystick bit
+            P0 is set to low level (assuming this is used for other purposes, such as initializing LED or other functions)
             """ 
             pin0.write_digital(0)
             
-            # 设置P12, P13, P14, P15为输入并启用上拉电阻  
+            #P12, P13, P14, P15 are set to input and pull-up mode  
             pin12.set_pull(pin12.PULL_UP) 
             pin13.set_pull(pin13.PULL_UP) 
             pin14.set_pull(pin14.PULL_UP)   
             pin15.set_pull(pin15.PULL_UP)  
             
-            # P16设置为高电平（可能是振动马达的控制引脚）  
+            #Vibration motor control pin output high level, default off state  
             pin16.write_digital(1) 
       
-      def get_button(self,button):  
+      def get_button(self, button):  
             """ 
-            获取按钮状态
-            button:传入按键编号(P12,P13,P14,P15)
-            检测对应编号按键有没有按下
-            按下则返回状态True,否则返回状态False
-            """ 
+            get button status
+            button: pass in the button number (P12, P13, P14, P15)
+            check if the corresponding button number is pressed
+            if the button is pressed, return True, otherwise return False
+            """
             pin = 1
-            if button == JoystickBitPin.P12:
+            if button == Joystick.p_btnC:
                 pin12.set_pull(pin12.PULL_UP)
                 pin = pin12.read_digital()
-            elif button == JoystickBitPin.P13:
+            elif button == Joystick.p_btnD:
                 pin13.set_pull(pin13.PULL_UP)
                 pin = pin13.read_digital()
-            elif button == JoystickBitPin.P14:
+            elif button == Joystick.p_btnE:
                 pin14.set_pull(pin14.PULL_UP)
                 pin = pin14.read_digital()
-            elif button == JoystickBitPin.P15:
+            elif button == Joystick.p_btnF:
                 pin15.set_pull(pin15.PULL_UP)
                 pin = pin15.read_digital()
-            return not pin  # 返回True如果按钮被按下（低电平），否则返回False  
+            # return True if the button is pressed (low level), otherwise return False
+            return not pin 
                 
-      def on_button_event(self,button, event_type, handler):  
+      def on_button_event(self, button, event_type, handler):  
             """ 
-            # 在MicroPython中,没有直接的onPulsed事件。你可能需要轮询或使用中断。  
-            # 这里仅提供一个轮询的示例。
-            # 注意：这个函数不会直接注册一个事件处理程序，而是立即检查按钮状态并调用处理程序（如果需要）。  
-            # 你需要在一个循环中调用此函数来轮询按钮。 
-            button:传入按键编号(P12,P13,P14,P15)
-            event_type:按键状态
-            handler:条件执行函数
-            检测对应编号按键此时的状态,若达到判断标准则执行handler
+            button: pass in the button number (P12, P13, P14, P15)
+            event_type: pass in the event type (down, up)
+            handler: pass in the handler function
+            check the status of the corresponding button number has met the event type,
+            if the event type is met, execute the handler function
             """  
             if JOYSTICKBIT.get_button(self,button) == (event_type == ButtonType['down']):  
                   handler()  
          
-      def get_rocker_value(self,rocker):  
+      def get_rocker_value(self, rocker):  
             """ 
-            # 获取摇杆值(在MicroPython中,使用ADC读取模拟值)
-            # adc = display.scroll(pin0.read_analog()) # 假设ADC通道0连接到了摇杆X(P1)和Y(P2) 
-            rocker:传入遥感方向
-            检测当前遥感对应X轴Y轴上的模拟战,即使用模拟战表示遥感在处在哪个方位
+            # Get the value of the rocker (use ADC to read the analog value)
+            # Assume ADC channel 0 is connected to the X (P1) and Y (P2) of the joystick
+            # adc = display.scroll(pin0.read_analog())
+            rocker: pass in the rocker type (X, Y)
             """   
-            if rocker == RockerType.X:   # P1是摇杆X的模拟输入   # 设置ADC分辨率  
-                  return pin1.read_analog()   # 读取模拟值  
-            elif rocker == RockerType.Y:   # P2是摇杆Y的模拟输入  # 设置ADC分辨率  
-                  return pin2.read_analog()  # 读取模拟值  
+            if rocker == RockerType.X:    
+                  return pin1.read_analog()   
+            elif rocker == RockerType.Y:    
+                  return pin2.read_analog()   
             else:  
                   return 0  
        
-      def vibration_motor(self,time_ms): 
+      def vibration_motor(self, time_ms): 
             """ 
-            振动马达控制函数
-            time_ms:时间量,单位为毫秒
-            控制震动马达震动time_ms毫秒
+            control the vibration motor to vibrate for the specified time
+            time_ms: pass in the time in milliseconds
             """   
-            pin16.write_digital(0) # 启动振动马达  
-            utime.sleep_ms(time_ms)  # 等待指定的毫秒数  
-            pin16.write_digital(1)  # 停止振动马达  
+            pin16.write_digital(0) # Start the vibration motor  
+            utime.sleep_ms(time_ms)  # Vibrate for time_ms milliseconds 
+            pin16.write_digital(1)  # Stop the vibration motor  
             
-            # 示例用法：  
+            # example:  
             # init_joystick_bit()  
             # print(get_button(JoystickBitPin.P12))  
             # on_button_event(JoystickBitPin.P13, ButtonType['down'], lambda: display.show(Image.YES)))  
             # print(get_rocker_value(RockerType.X))  
-            # vibration_motor(500)  # 振动500毫秒
-
-joystickbit = JOYSTICKBIT()
+            # vibration_motor(500)  # Vibrate for 500 milliseconds
 
 
-if __name__ == '__main__':
+
+# joystickbit = JOYSTICKBIT()
+
+
+# if __name__ == '__main__':
      
-      joystickbit.init_joystick_bit()
+#       joystickbit.init_joystick_bit()
       # JOYSTICKBIT.get_button(JoystickBitPin.P12)
       # JOYSTICKBIT.on_button_event(JoystickBitPin.P12,ButtonType['down'],lambda: display.show(Image.YES))
       # JOYSTICKBIT.get_rocker_value(RockerType.X)
