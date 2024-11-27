@@ -1,39 +1,73 @@
-from microbit import i2c, display, Image
+import microbit
 
+class MicrobotMotor:
+    FORWARD_FLAG = 0x80
 
-class Microbot():
-    '''Initialize moto:bit hardware.
-    '''
-    I2C_ADDR = 0x59         # 89 in decimal
-    CMD_ENABLE = 0x70       # 112 in decimal
-    CMD_SPEED_LEFT = 0x21   # 33 in decimal
-    CMD_SPEED_RIGHT = 0x20  # 32 in decimal
+    def __init__(self, i2c_addr, cmd_speed, invert):
+        self.i2c_addr = i2c_addr
+        self.cmd_speed = cmd_speed
+        self.invert = invert
 
-    def __init__(self):
-        # cool code that you'll write
-        # lol I can't give you all the answers
-        pass
+    def __drive(self, speed):
+        flags = 0
+        if self.invert:
+            speed = -speed
+        if speed >= 0:
+            flags |= MicrobotMotor.FORWARD_FLAG
+        speed = int(speed / 100 * 127)
+        if speed < -127:
+            speed = -127
+        if speed > 127:
+            speed = 127
+        speed = (speed & 0x7f) | flags
+        microbit.i2c.write(self.i2c_addr, bytes([self.cmd_speed, speed]))
+
+    def forward(self, speed):
+        '''Forward motor control.
+
+        Args:
+            speed (int|float): -100 ~ +100
+        '''
+        self.__drive(speed)
+
+    def reverse(self, speed):
+        '''Reverse motor control.
+
+        Args:
+            speed (int|float): -100 ~ +100
+        '''
+        self.__drive(-speed)
+
+class Microbot:
+    I2C_ADDR = 0x59
+    CMD_ENABLE = 0x70
+    CMD_SPEED_LEFT = 0x21
+    CMD_SPEED_RIGHT = 0x20
 
     def enable(self):
         '''Enable motor driver.
         '''
-        i2c.write(self.I2C_ADDR, bytes([self.CMD_ENABLE, 0x01]))
+        microbit.i2c.write(Microbot.I2C_ADDR, bytes([Microbot.CMD_ENABLE, 0x01]))
 
     def disable(self):
         '''Disable motor driver.
         '''
-        i2c.write(self.I2C_ADDR, bytes([self.CMD_ENABLE, 0x00]))
+        microbit.i2c.write(Microbot.I2C_ADDR, bytes([Microbot.CMD_ENABLE, 0x00]))
 
-    def drive(self, speed_left, speed_right):
-        '''Drive motors continuously based on 100 point scale.
+    def left_motor(self, invert = False):
+        '''Acquire left motor object.
+
         Args:
-            speed_left (int|float): Motor power value. [-100, 100]
-            speed_right (int|float): Motor power value. [-100, 100]
+            invert (bool): Invert polarity. (default: False)
         '''
-        speeds = [speed_left, speed_right]
-        # cool code that you'll write
-        # lol think again, no free answers here
-        i2c.write(self.I2C_ADDR, bytes([self.CMD_SPEED_LEFT, speeds[0]]))
-        i2c.write(self.I2C_ADDR, bytes([self.CMD_SPEED_RIGHT, speeds[1]]))
+        return MicrobotMotor(Microbot.I2C_ADDR, Microbot.CMD_SPEED_LEFT, invert)
+
+    def right_motor(self, invert = False):
+        '''Acquire right motor object.
+
+        Args:
+            invert (bool): Invert polarity. (default: False)
+        '''
+        return MicrobotMotor(Microbot.I2C_ADDR, Microbot.CMD_SPEED_RIGHT, invert)
 
 

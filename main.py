@@ -56,12 +56,17 @@ elif role == "cutebot":
 elif role == "microbot":
     radio.config(group=j2c_channel)
     microbot = Microbot()
+    microbot.enable()
     while True:
         msg = radio.receive()
         if msg:
             x,y = msg.split(",")
             x,y = int(x), int(y)
             print("Received x:{} y:{}".format(x,y))
+            left_wheel_speed, right_wheel_speed =  y - x, y + x
+            print("Left Wheel Speed:{} Right Wheel Speed:{}".format(left_wheel_speed,right_wheel_speed))
+            microbot.left_motor(invert=True).forward(left_wheel_speed)
+            microbot.right_motor(invert=True).forward(right_wheel_speed)
 else:
     print("Invalid device")
     display.scroll("Invalid device")
