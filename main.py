@@ -7,7 +7,7 @@ import machine
 
 joystick_id = b')\xdc2L\x95M\xdc\x8d'
 cutebot_id = b'\x02\xd3\xc4\xe7xr\xe9\xce'
-mbot_id = b'\x84\x02;\x03\xb7,\x90\x7f'
+microbot_id = b'\x84\x02;\x03\xb7,\x90\x7f'
 
 cur_id = machine.unique_id()
 
@@ -16,8 +16,8 @@ if cur_id == joystick_id:
     role = "joystick"
 elif cur_id == cutebot_id:
     role = "cutebot"
-elif cur_id == mbot_id:
-    role = "mbot"
+elif cur_id == microbot_id:
+    role = "microbot"
 else:
     role = None#invalid device
     print("Invalid device")
@@ -54,8 +54,7 @@ elif role == "cutebot":
             print("Left Wheel Speed:{} Right Wheel Speed:{}".format(left_wheel_speed,right_wheel_speed))
             cutebot.set_motors_speed(left_wheel_speed, right_wheel_speed)
 
-
-elif role == "mbot":
+elif role == "microbot":
     pass
 else:
     print("Invalid device")
