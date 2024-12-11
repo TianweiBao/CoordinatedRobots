@@ -101,7 +101,7 @@ int main(void) {
             
             // nrf_delay_ms(1000/4);
         }
-    //if the role is a microbot1
+    //if the role is a cutebot
     } else if (strcmp(role, "Cutebot") == 0) {
         MicrobitRadio cutebot_radio;
         radio_init(&cutebot_radio, PAN_ID, PAN_ID, cutebot_src_addr, cutebot_dst_addr, channel);
@@ -165,6 +165,7 @@ int main(void) {
             // printf("Tracking status: %d\n", tracking_status);
             // nrf_delay_ms(1000/4);
         }
+    //if the role is a microbot1
     } else if (strcmp(role, "Microbot1") == 0) {
         //initialize the radio
         MicrobitRadio microbot1_radio;
